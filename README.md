@@ -56,3 +56,13 @@ pip install -r requirements.txt
 
 # Pull the LLM
 ollama pull llama3.1
+
+## ⚡ Quick Start (The "Magic Command")
+
+Since we are not running Ollama as a system service, you must run the server manually to force it to use the AMD GPU (Vulkan Mode).
+
+**1. Start the Brain (Terminal 1)**
+Keep this window open while chatting!
+```bash
+# Forces Ollama to use Vulkan (Video Game Drivers) for the GPU
+OLLAMA_VULKAN=1 ollama serve
