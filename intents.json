@@ -1,0 +1,9 @@
+{
+  "intents": [
+    {"tag": "greeting", "patterns": ["Hi", "Hello", "Hail", "Met well"], "responses": ["Greeting"]},
+    {"tag": "goodbye", "patterns": ["Bye", "Farewell", "I must go"], "responses": ["Bye"]},
+    {"tag": "joke", "patterns": ["Tell me a joke", "Make me laugh"], "responses": ["Joke"]},
+    {"tag": "rule_lookup", "patterns": ["How does grappling work?", "What is a fireball?", "Explain stealth", "Hit points calculation", "Classes info"], "responses": ["Searching..."]},
+    {"tag": "roll_dice", "patterns": ["Roll a d20", "Roll initiative", "Roll for damage", "Can you roll 2d6?", "Roll 4d8+4", "Give me a dexterity check", "Roll the dice"], "responses": ["ROLL_TOOL"] }
+  ]
+}
