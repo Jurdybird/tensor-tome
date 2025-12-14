@@ -1,0 +1,12 @@
+.venv/
+venv/
+.env
+__pycache__/
+*.py[cod]
+*.pkl
+*.pickle
+*.keras
+dnd_db/
+data/
+.DS_Store
+Thumbs.db
