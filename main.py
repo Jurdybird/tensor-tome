@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import numpy as np
 from keras_preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
@@ -34,7 +35,7 @@ oov_tok = "<OOV>"     # If a word is not in the vocab, replace it with this toke
 
 tokenizer = Tokenizer(num_words=vocab_size, oov_token=oov_tok)
 
-# Fit the tokenizer on the training sentences
+# fit the tokenizer on the training sentences
 tokenizer.fit_on_texts(training_sentences)
 word_index = tokenizer.word_index   # mapping of words to their index in the vocab
 
@@ -44,42 +45,40 @@ sequences = tokenizer.texts_to_sequences(training_sentences)
 # Make them all same length by padding
 padded_sequences = pad_sequences(sequences, truncating='post', maxlen=max_len)
 
-# Encode the labels
+# encode the labels
 lbl_encoder = LabelEncoder()
 lbl_encoder.fit(training_labels)
 
-# Transform the labels and make sure they are in numpy array format
+# transform the labels and make sure they are in numpy array format
 training_labels_final = lbl_encoder.transform(training_labels)
 training_labels_final = np.array(training_labels_final)
 
-# Verification prints
+# verification prints
 print("Success! Data is processed.")
 print(f"Vocab Size: {len(word_index)}")
 print(f"Example Pattern: {training_sentences[0]} -> {padded_sequences[0]}")
 print(f"Example Label: {training_labels[0]} -> {training_labels_final[0]}")
 
 
-# The model
+# the model
 model = Sequential()
 
 # Layer 1: Embedding layer
 model.add(Embedding(input_dim=vocab_size, output_dim=embedding_dim, input_length=max_len)) # output_dim =  how detailed should vectors be?
 
-# Layer 2: Averager (GlobalAveragePooling1D)
+# layer 2: averager (globalaveragepooling1d)
 model.add(GlobalAveragePooling1D())
 
-# Layer 3: Hidden layer
+# layer 3: hidden layer
 model.add(Dense(16, activation='relu'))
 
-# Layer 4: Output layer
+# layer 4: output layer
 model.add(Dense(len(labels), activation='softmax'))
  
 model.build(input_shape=(None, max_len))
 model.summary()
 
-
-# Training model
-
+# training model
 model.compile(
     loss='sparse_categorical_crossentropy',
     optimizer='adam',
@@ -89,7 +88,7 @@ model.compile(
 history = model.fit(padded_sequences, training_labels_final,
                     epochs=500, verbose=1)
 
-# Save model, tokenizer, and tags
+# save model, tokenizer, and label encoder
 model.save("chat_model.keras")
 with open('tokenizer.pickle', 'wb') as handle:
     pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)

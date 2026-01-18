@@ -1,68 +1,69 @@
-# Tensor Tome
-**A Local, Hybrid-Architecture AI Agent for D&D 5e**
+# tensor-tome
+**a local, hybrid-architecture d&d bot**
 
-TensorTome is a locally hosted AI assistant designed to answer Dungeons & Dragons 5th Edition rules questions and perform game actions (dice rolling) with high accuracy. 
+tensor-tome is an offline ai assistant that helps with d&d 5e rules and dice rolling. 
 
-Unlike standard "wrapper" chatbots, TensorTome utilizes a **Hybrid Architecture**: it uses a lightweight TensorFlow/Keras classifier to route user intents before invoking the heavy LLM. This ensures that deterministic tasks (like math) are handled by code, while semantic queries are handled by a RAG (Retrieval Augmented Generation) pipeline.
+it used to be a simple script, but I refactored it to use **langgraph**. this means instead of just a loop, it has a proper state machine (a graph) to decide what to do next.
 
----
+it's built on a **hybrid architecture**:
+1. first, a tiny tensorflow classifier checks your intent (are you saying hi? rolling dice? asking a rule?).
+2. then, **langgraph** routes you to the right node:
+   - **dice node**: deterministic math. no ai hallucinations here.
+   - **chat node**: just friendly vibes.
+   - **rag node**: searches your pdfs locally and answers questions using ollama.
 
-## Architecture
+## features
 
-The system processes user input through a multi-stage pipeline:
+- **metadata filtering**: looks for rules in the player's handbook, not random monster lore.
+- **hardware optimized**: forces vulkan on linux so your amd gpu actually does the work.
+- **privacy**: runs 100% offline. no keys, no cloud, no spying.
+- **langgraph**: uses a modern, graph-based flow. easier to extend later.
 
-1.  **Intent Classification (The Router):** A custom-trained **TensorFlow/Keras** neural network analyzes the input in <0.5s to determine intent (e.g., `rule_lookup`, `roll_dice`, `greeting`).
-2.  **Semantic Routing:**
-    * **Action Path:** If a dice roll is detected, the system bypasses the LLM and uses a regex-based Python tool for 100% mathematical accuracy.
-    * **Knowledge Path:** If a rule question is detected, the system queries **ChromaDB**.
-3.  **Strict RAG Retrieval:**
-    * Queries are filtered by metadata tags (e.g., searching only the *Player's Handbook* for rules, ignoring the *Monster Manual* to reduce noise).
-    * Retrieved chunks are injected into a strict **Llama 3.1** prompt designed to prevent hallucinations (e.g., 3.5e rules).
-4.  **Local Inference:** The final response is generated using **Ollama**, optimized for consumer AMD hardware via Vulkan/ROCm.
+## tech stack
 
-## Key Features
+- python 3.12
+- langgraph & langchain
+- tensorflow (keras) for intent classification
+- ollama (llama 3.2)
+- chromadb (vector store)
 
-* **Metadata Filtering:** Solves common RAG noise issues (e.g., searching for "Critical Hits" pulls valid rules instead of random monster stat blocks) by tagging and filtering PDF sources.
-* **Hardware Optimization:** Custom configuration to force **AMD Radeon RX 6600** GPU usage on Linux via Vulkan driver overrides, preventing CPU bottlenecks.
-* **Agentic Tool Use:** Recognizes natural language commands like *"Roll for initiative"* or *"Damage is 2d6+4"* and executes them programmatically.
-* **Privacy First:** Runs 100% offline. No data is sent to OpenAI or cloud providers.
+## setup
 
-## Tech Stack
+### 1. prerequisites
+- python 3.10+
+- ollama installed locally
+- a gpu (optional but nice)
 
-* **Core:** Python 3.12, LangChain
-* **ML/AI:** TensorFlow (Keras), Ollama (Llama 3.1 8B)
-* **Database:** ChromaDB (Vector Store) with HuggingFace Embeddings (`all-MiniLM-L6-v2`)
-* **Hardware Acceleration:** AMD ROCm / Vulkan
-
-## Installation
-
-### 1. Prerequisites
-* Python 3.10+
-* Ollama installed locally
-* AMD GPU (Optional, but recommended for speed)
-
-### 2. Setup
+### 2. install
 ```bash
-# Clone the repository
-git clone [https://github.com/yourusername/tensor-tome.git](https://github.com/yourusername/tensor-tome.git)
+# clone it
+git clone https://github.com/yourusername/tensor-tome.git
 cd tensor-tome
 
-# Create virtual environment
+# venv setup
 python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+source .venv/bin/activate
 
-# Install dependencies
+# install deps
 pip install -r requirements.txt
 
-# Pull the LLM
-ollama pull llama3.1
+# get the model
+ollama pull llama3.2
+```
 
-## ⚡ Quick Start (The "Magic Command")
+## running it
 
-Since we are not running Ollama as a system service, you must run the server manually to force it to use the AMD GPU (Vulkan Mode).
+since we aren't using a system service for ollama, you might need to run it manually to get gpu acceleration working right on some systems.
 
-**1. Start the Brain (Terminal 1)**
-Keep this window open while chatting!
+**1. start the brain**
 ```bash
-# Forces Ollama to use Vulkan (Video Game Drivers) for the GPU
+# force vulkan mode if you have an amd gpu
 OLLAMA_VULKAN=1 ollama serve
+```
+
+**2. start the bot**
+```bash
+python chat_llm.py
+```
+
+that's it. have fun.
