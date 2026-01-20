@@ -1,7 +1,7 @@
 # tensor-tome
 **a local, hybrid-architecture d&d bot**
 
-tensor-tome is an offline ai assistant that helps with d&d 5e rules and dice rolling. 
+tensor-tome is an offline ai assistant that helps with tabletop rules and dice rolling. 
 
 it used to be a simple script, but I refactored it to use **langgraph**. this means instead of just a loop, it has a proper state machine (a graph) to decide what to do next.
 
